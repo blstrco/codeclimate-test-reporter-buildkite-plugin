@@ -22,11 +22,20 @@ download_artifacts() {
 format_file() {
   output_file="coverage/$formatted_file_prefix.$2.json"
   printf -- "Formatting file: %s to %s\\n" "$1" "$output_file"
-  ./cc-test-reporter format-coverage ${debug:+"-d"} \
+
+  if [ -z "${BUILDKITE_PLUGIN_CODECLIMATE_TEST_REPORTER_PREFIX:-}" ]; then
+    ./cc-test-reporter format-coverage ${debug:+"-d"} \
+    --input-type "${BUILDKITE_PLUGIN_CODECLIMATE_TEST_REPORTER_INPUT_TYPE}" \
+    --output "${output_file}" \
+    "$1"
+  else
+    ./cc-test-reporter format-coverage ${debug:+"-d"} \
     --input-type "${BUILDKITE_PLUGIN_CODECLIMATE_TEST_REPORTER_INPUT_TYPE}" \
     --prefix "${BUILDKITE_PLUGIN_CODECLIMATE_TEST_REPORTER_PREFIX}" \
     --output "${output_file}" \
     "$1"
+  fi 
+
 }
 
 format_files() {
